@@ -7,6 +7,6 @@ from crawling.service.query import *
 melon_crawler = MelonCrawler()
 crawl_data = melon_crawler.crawl('https://www.melon.com/chart/index.htm')
 
-# 2. insert data into database.
+# # 2. insert data into database.
 _db = databaseSession(str(crawl_data), date.datetime.now(), 'Julia', insert_sql)
 _db.connection()

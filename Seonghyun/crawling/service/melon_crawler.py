@@ -31,6 +31,7 @@ class MelonCrawler:
             # selector : css selector.
 
             # select song information (노래 제목은 1개, 가수는 1명 이상)
+
             song_info = soup.select('#frm > div > table > tbody > tr > td:nth-child(4) > div > div')
 
             top_list = []
