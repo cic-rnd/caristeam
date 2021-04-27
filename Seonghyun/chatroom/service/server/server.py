@@ -30,11 +30,11 @@ def handle(client):
             print(e)
             print(type(e))
 
-            lock.acquire()
-            print("handle lock")
+            # 소켓정보를 key 값으로 nickname 을 찾음.
             nickname = users[client]
             broadcast('{} 님이 채팅방을 나가셨습니다.'.format(nickname).encode('UTF-8'))
-            lock.release()
+            
+            # 접속 종료
             client.close()
 
             # 전체 이용자 목록에서 나간 이용자 삭제
@@ -75,8 +75,6 @@ if __name__ == "__main__":
     # Connection Data
     host = '192.168.19.212'
     port = 55555
-
-    lock = threading.Lock()
 
     # Starting Server
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
