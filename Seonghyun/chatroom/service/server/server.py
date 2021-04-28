@@ -11,9 +11,10 @@ def broadcast(*args):
     # users
     clients = users.keys()
 
-    # if문으로 소켓이 살아있는지 확인
+    # 스레드가 살아있는 client에만 메시지 전송 
     for client in clients:
-        client.send(message)
+        if users_thread[client].is_alive():
+            client.send(message)
 
 
 # Handling Messages From Clients
@@ -24,7 +25,7 @@ def handle(client):
             # Broadcasting Messages
             message = client.recv(1024)
             broadcast(message)
-            print(message)
+
         except Exception as e:
             print("handle Exception")
             print(e)
@@ -33,7 +34,7 @@ def handle(client):
             # 소켓정보를 key 값으로 nickname 을 찾음.
             nickname = users[client]
             broadcast('{} 님이 채팅방을 나가셨습니다.'.format(nickname).encode('UTF-8'))
-            
+
             # 접속 종료
             client.close()
 
@@ -53,7 +54,6 @@ def receive():
         # 접속을 기다림
         client, address = server.accept()
         print("Connected with {}".format(str(address)))
-        print(client)
         # 연결된 클라이언트의 소켓정보를 key 값으로 사용자 닉네임을 저장
         nickname = client.recv(1024).decode('UTF-8')
         users[client] = nickname
@@ -61,11 +61,15 @@ def receive():
         # Print And Broadcast Nickname
         print("Nickname is {}".format(nickname))
         # client.send('채팅에 접속하셨습니다.\n'.encode('UTF-8'))
-        broadcast("{} 님이 채팅에 접속하셨습니다".format(nickname).encode('UTF-8'))
+
 
         # Start Handling Thread For Client
         thread = threading.Thread(target=handle, args=(client,))
+
+        users_thread[client] = thread
         thread.start()
+        broadcast("{} 님이 채팅에 접속하셨습니다".format(nickname).encode('UTF-8'))
+
 
 
 if __name__ == "__main__":
@@ -89,6 +93,7 @@ if __name__ == "__main__":
 
     # Lists For Clients socket information and Their Nicknames
     users = {}
+    users_thread = {}
 
     # 새로운 클라이언트를 받음
     receive()
