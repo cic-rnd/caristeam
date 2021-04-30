@@ -26,7 +26,10 @@ class ChatClient:
         # chatroom_ui 모듈을 불러와서, 채팅창에서 전송 버튼을 누르면 write() 함수가 호출되도록 연결
         self.chat_ui = chatroom_ui.Ui_Form()
         self.chat_ui.setupUi(self.chatWidget)
+        
+        # 전송 버튼을 누르거나 엔터키를 누르면 write 함수 호출
         self.chat_ui.pushButton.clicked.connect(self.write)
+        self.chat_ui.msgLineEdit.returnPressed.connect(self.write)
 
         # connect_ui 모듈을 불러와서, 접속 버튼을 누르면 btn_connect_clicked() 함수가 호출되도록 연결
         self.connect_ui = connect_ui.Ui_Dialog()
@@ -49,8 +52,9 @@ class ChatClient:
         self.nickname = self.connect_ui.nicknameTextEdit.toPlainText()
 
         # Connection Data
-        host = '192.168.19.212'
-        port = 55555
+        host = self.connect_ui.ipTextEdit.toPlainText()
+        port = int(self.connect_ui.portTextEdit.toPlainText())
+        print(host, port)
 
         self.client.connect((host, port))
         self.client.send(self.nickname.encode('UTF-8'))
@@ -86,7 +90,7 @@ class ChatClient:
 
     # Sending Messages To Server
     def write(self):
-        message = '{}: {}'.format(self.nickname, self.chat_ui.msgTextEdit.toPlainText())
+        message = '{}: {}'.format(self.nickname, self.chat_ui.msgLineEdit.text())
         try:
             self.client.send(message.encode('UTF-8'))
         except Exception as e:
@@ -97,7 +101,7 @@ class ChatClient:
             self.client.close()
 
         # 메시지 전송 완료 후 입력창을 비워줌
-        self.chat_ui.msgTextEdit.clear()
+        self.chat_ui.msgLineEdit.clear()
 
 
 if __name__ == "__main__":
